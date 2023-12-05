@@ -3,7 +3,7 @@ from markupsafe import escape
 import utils.FlowCatch
 from flask_cors import CORS
 import json
-import common.Result
+import common.Result as R
 
 app = Flask(__name__)
 CORS(app)
@@ -31,5 +31,4 @@ def CatchFlow(FlowNum:int):
 def FlowPacket():
     utils.FlowCatch.Clear()
     callback=utils.FlowCatch.catch(5) #获得一个data
-    callbackpacket=common.Result.Result.success(callback)
-    return jsonify(callbackpacket),{"Content-Type":"application/json"}
+    return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
