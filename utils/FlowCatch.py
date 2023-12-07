@@ -36,7 +36,7 @@ def packet_callback(packet):
 def Catch(count:int):
     sniff(prn=packet_callback,count=count,iface='Realtek Gaming 2.5GbE Family Controller',filter='')
     return CallBack
-def catch(count:int):
+def catch(count:int=5):
     sniff(prn=packet_callback,count=count,iface='Realtek Gaming 2.5GbE Family Controller',filter='')
     return PacketObject
 def Clear():

@@ -4,10 +4,12 @@ import utils.FlowCatch
 from flask_cors import CORS
 import json
 import common.Result as R
+import utils.SearchNIC
 
 app = Flask(__name__)
 CORS(app)
 
+NICPacket=utils.SearchNIC.GetNetworkAdapters()
 @app.route('/hello')
 def hello():
     return '<h1>Hello Totoro!</h1>'
@@ -30,5 +32,8 @@ def CatchFlow(FlowNum:int):
 @app.route('/')
 def FlowPacket():
     utils.FlowCatch.Clear()
-    callback=utils.FlowCatch.catch(5) #获得一个data
+    callback=utils.FlowCatch.catch() #获得一个data
     return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
+@app.route('/SearchNIC')
+def NICSearch():
+    return jsonify(R.Result.success(NICPacket)),{"Content-Type":"application/json"}
