@@ -1,4 +1,4 @@
-from flask import Flask,render_template,url_for,jsonify
+from flask import Flask,render_template,url_for,jsonify,request
 from markupsafe import escape
 import utils.FlowCatch
 from flask_cors import CORS
@@ -29,11 +29,20 @@ def CatchFlow(FlowNum:int):
     utils.FlowCatch.Clear()
     callback=utils.FlowCatch.Catch(FlowNum) 
     return render_template('result.html',callback=callback )
-@app.route('/')
+@app.route('/',methods=['POST'])
 def FlowPacket():
     utils.FlowCatch.Clear()
-    callback=utils.FlowCatch.catch() #获得一个data
+    data=request.get_data()
+    Settings=json.loads(data)
+    callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
     return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
 @app.route('/SearchNIC')
 def NICSearch():
     return jsonify(R.Result.success(NICPacket)),{"Content-Type":"application/json"}
+@app.route('/SendJson',methods=['POST'])
+def Recive():
+    utils.FlowCatch.Clear()
+    data=request.get_data()
+    Settings=json.loads(data)  #获得一个包含了Filter、Adapter、Counts属性的字典
+    callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
+    return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}

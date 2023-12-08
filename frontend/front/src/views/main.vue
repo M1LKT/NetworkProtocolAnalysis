@@ -10,7 +10,7 @@
             </div>
             <div style="flex:0.5;">
                 <el-form :model="Settings" ref="Settings">
-                    <el-form-item prop="Filter" label="过滤规则">
+                    <el-form-item prop="Filter" label="过滤规则 src host 169.254.126.132">
                         <el-input v-model="Settings.Filter" placeholder="BPF过滤规则" clearable></el-input>
                     </el-form-item>
                 </el-form>
@@ -31,11 +31,12 @@
             </div>
         </div>
         <el-card style="width: 1050px;margin: 0px auto;">
-            <el-table :data="FlowPacket" style="width: 1000px;margin: 0px auto;border: 1px solid rgb(0, 0, 0);">
-            <el-table-column label="Summary" prop="summary"></el-table-column>
+            <el-table :data="FlowPacket" style="width: 1000px;margin: 0px auto;border: 1px solid rgb(0, 0, 0);" height="290">
+            <el-table-column label="概要" prop="summary"></el-table-column>
             </el-table>
         </el-card>
         <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="FlowCatch('Settings')">抓取</el-button>
+        <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="SendJson('Settings')">发送json测试</el-button>
     </body>
 </template>
 
@@ -63,7 +64,7 @@ export default{
         FlowCatch(formName){
             this.$refs[formName].validate((valid)=>{
                 if(valid){
-                    this.$request.get('/').then(res=>{
+                    this.$request.post('/',this.Settings).then(res=>{
                         if(res.code=='200'){
                             this.FlowPacket=res.data
                             this.$message({
@@ -75,7 +76,23 @@ export default{
                     })
                 }
             })
-        }
+        },
+        SendJson(formName){
+            this.$refs[formName].validate((valid)=>{
+                if(valid){
+                    this.$request.post('/SendJson',this.Settings).then(res=>{
+                        if(res.code=='200'){
+                            this.FlowPacket=res.data
+                            this.$message({
+                            message: res.msg,
+                            type: 'success',
+                        });
+                        console.log(this.Settings);
+                        }
+                    })
+                }
+            })
+        }  
     },
    mounted(){
         this.$request.get('/SearchNIC').then(res=>{

@@ -6,10 +6,11 @@ CallBack=[]
 PacketObject=[]
 def packet_callback(packet):
     if packet.haslayer('IP'):
-        Ehter_packet=packet['Ether']
         ip_packet = packet['IP']
-        src_mac=Ehter_packet.src
-        dst_mac=Ehter_packet.dst
+        if packet.haslayer('Ether'):
+            Ehter_packet=packet['Ether']
+            src_mac=Ehter_packet.src
+            dst_mac=Ehter_packet.dst
         timestamp = packet.time
         local_time = datetime.datetime.fromtimestamp(timestamp)
         formatted_time = local_time.strftime('%Y-%m-%d %H:%M:%S')
@@ -36,8 +37,8 @@ def packet_callback(packet):
 def Catch(count:int):
     sniff(prn=packet_callback,count=count,iface='Realtek Gaming 2.5GbE Family Controller',filter='')
     return CallBack
-def catch(count:int=5):
-    sniff(prn=packet_callback,count=count,iface='Realtek Gaming 2.5GbE Family Controller',filter='')
+def catch(count:int=5,Adapter='',Filter=''):
+    sniff(prn=packet_callback,count=count,iface=Adapter,filter=Filter)
     return PacketObject
 def Clear():
     CallBack.clear()

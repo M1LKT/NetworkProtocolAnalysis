@@ -4,7 +4,7 @@ import axios from 'axios'
 //创建一个新的axios对象
 const request =axios.create({
     baseURL:'http://localhost:5000',
-    timeout:30000
+    timeout:300000
 })
 //request拦截器
 //发送前对请求进行处理，如统一添加token
