@@ -1,18 +1,24 @@
 <template>
     <body>
         <div style="display: flex;width: 1050px;margin: auto;">
-            <div style="flex:0.5;">
+            <div style="flex:0.35;">
                 <el-form :model="Settings" ref="Settings" :rules="rules" > 
                     <el-form-item prop="Counts" label="抓取数量">
                         <el-input v-model.number="Settings.Counts" placeholder="请输入抓取的流量包数量，默认为5条" ></el-input>
                     </el-form-item>
                 </el-form>
             </div>
-            <div style="flex:0.3;">
-                <h1>1</h1>
+            <div style="flex:0.5;">
+                <el-form :model="Settings" ref="Settings">
+                    <el-form-item prop="Filter" label="过滤规则">
+                        <el-input v-model="Settings.Filter" placeholder="BPF过滤规则" clearable></el-input>
+                    </el-form-item>
+                </el-form>
             </div>
             <div style="flex:0.3;">
-                        <el-select v-model="value" clearable placeholder="请选择" style="width: 360px;">
+                <el-form :model="Settings" ref="Settings" > 
+                    <el-form-item prop="Adapter" label="网卡（请选择正确可用的网卡设备）">
+                        <el-select v-model="Settings.Adapter" clearable placeholder="请选择" style="width: 360px;">
                             <el-option
                             v-for="item in NetworkAdapters"
                             :key="item.value"
@@ -20,6 +26,8 @@
                             :value="item.value">
                             </el-option>
                         </el-select>
+                    </el-form-item>
+                </el-form>
             </div>
         </div>
         <el-card style="width: 1050px;margin: 0px auto;">
@@ -33,7 +41,7 @@
 
 <script>
 export default{
-    name:'main',
+    name:'Main',
     data(){
         return{
             FlowPacket:[],

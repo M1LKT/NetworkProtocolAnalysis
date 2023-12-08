@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import main from '../views/main.vue'
+import Main from '../views/Main.vue'
 import test from '../views/test.vue'
 
 Vue.use(VueRouter)
@@ -22,8 +22,8 @@ const routes = [
   },
   {
     path:'/main',
-    name:'main',
-    component:main
+    name:'Main',
+    component:Main
   },
   {
     path:'/test',
