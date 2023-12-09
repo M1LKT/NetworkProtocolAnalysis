@@ -4,7 +4,7 @@
             <div style="flex:0.35;">
                 <el-form :model="Settings" ref="Settings" :rules="rules" > 
                     <el-form-item prop="Counts" label="抓取数量">
-                        <el-input v-model.number="Settings.Counts" placeholder="请输入抓取的流量包数量，默认为5条" ></el-input>
+                        <el-input v-model.number="Settings.Counts" placeholder="请输入抓取的流量包数量" ></el-input>
                     </el-form-item>
                 </el-form>
             </div>
@@ -31,12 +31,16 @@
             </div>
         </div>
         <el-card style="width: 1050px;margin: 0px auto;">
-            <el-table :data="FlowPacket" style="width: 1000px;margin: 0px auto;border: 1px solid rgb(0, 0, 0);" height="290">
+            <el-table :data="FlowPacket" border style="width: 1000px;margin: 0px auto;border: 1px solid rgb(0, 0, 0);" height="290">
             <el-table-column label="概要" prop="summary"></el-table-column>
+            <el-table-column fixed="right" label="操作" width="100">
+                <template slot-scope="scope">
+                    <el-button @click="handleClick(scope.row)" type="text" size="small">查看全部内容</el-button>
+                </template>
+            </el-table-column>
             </el-table>
         </el-card>
         <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="FlowCatch('Settings')">抓取</el-button>
-        <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="SendJson('Settings')">发送json测试</el-button>
     </body>
 </template>
 
@@ -71,28 +75,14 @@ export default{
                             message: res.msg,
                             type: 'success',
                         });
-                        console.log(this.Settings);
                         }
                     })
                 }
             })
         },
-        SendJson(formName){
-            this.$refs[formName].validate((valid)=>{
-                if(valid){
-                    this.$request.post('/SendJson',this.Settings).then(res=>{
-                        if(res.code=='200'){
-                            this.FlowPacket=res.data
-                            this.$message({
-                            message: res.msg,
-                            type: 'success',
-                        });
-                        console.log(this.Settings);
-                        }
-                    })
-                }
-            })
-        }  
+        handleClick(row) {
+            console.log(row);
+        } 
     },
    mounted(){
         this.$request.get('/SearchNIC').then(res=>{
