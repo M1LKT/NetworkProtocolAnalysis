@@ -10,7 +10,7 @@
             </div>
             <div style="flex:0.5;">
                 <el-form :model="Settings" ref="Settings">
-                    <el-form-item prop="Filter" label="过滤规则 src host 169.254.126.132">
+                    <el-form-item prop="Filter" label="过滤规则 ">
                         <el-input v-model="Settings.Filter" placeholder="BPF过滤规则" clearable></el-input>
                     </el-form-item>
                 </el-form>
@@ -41,6 +41,11 @@
             </el-table>
         </el-card>
         <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="FlowCatch('Settings')">抓取</el-button>
+        <el-card style="width: 1050px;margin: 50px auto;text-align: start;">
+            <h3 style="margin-top: 5px; ">详细信息</h3>
+            <p>{{ Summary }}</p>
+            <json-viewer :value="ExactInfo"  ></json-viewer>
+        </el-card>
     </body>
 </template>
 
@@ -62,6 +67,8 @@ export default{
                     {type: 'number', message: '必须为数字值'},
                 ],
             },
+            ExactInfo:[],
+            Summary:''
         }
     },
     methods:{
@@ -82,6 +89,9 @@ export default{
         },
         handleClick(row) {
             console.log(row);
+            this.ExactInfo=row.exactinfo
+            this.Summary=row.summary
+            console.log(this.Summary)
         } 
     },
    mounted(){

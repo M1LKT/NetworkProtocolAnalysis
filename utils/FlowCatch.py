@@ -2,6 +2,7 @@ from scapy.all import *
 import time
 import datetime
 import utils.scapy_http as http
+import scapy.layers.http as Http
 
 CallBack=[]
 PacketObject=[]
@@ -11,12 +12,9 @@ def DnsrrDict(dnsrr_packet):
         "type":dnsrr_packet.type,
         "rclass":dnsrr_packet.rclass,
         "ttl":dnsrr_packet.ttl,
-        "rdlen":dnsrr_packet.rdlen
+        "rdlen":dnsrr_packet.rdlen,
+        "rdata":dnsrr_packet.rdata
     }
-    if isinstance(dnsrr_packet.payload,NoPayload):
-        dnsrrDict['rdata']=dnsrr_packet.rdata
-    else:
-        dnsrrDict['rdata']=DnsrrDict(dnsrr_packet.payload)
     return dnsrrDict
 def flagvalue_to_json(flagvalue):
     # 将 FlagValue 对象转换为可以序列化为 JSON 的数据
@@ -86,6 +84,9 @@ def packet_callback(packet):
         TCP_chksum = TCP_packet.chksum
         TCP_urgptr = TCP_packet.urgptr
         TCP_options = TCP_packet.options
+        for i, option in enumerate(TCP_options):
+            if isinstance(option[1], bytes):
+                TCP_options[i] = (option[0], option[1].decode())
         DataCache['TCP'] = {
             "src_port": TCP_src_port,
             "dst_port": TCP_dst_port,
@@ -129,9 +130,12 @@ def packet_callback(packet):
         Dns_ancount = Dns_packet.ancount
         Dns_nscount = Dns_packet.nscount
         Dns_arcount = Dns_packet.arcount
-        Dns_qd=Dns_packet.qd.summary()
-        an_packet=Dns_packet.an
-        Dns_an=an_packet.summary()
+        Dns_qd={
+            "qname":str(Dns_packet.qd.qname),
+            "qtype":Dns_packet.qd.qtype,
+            "qclass":Dns_packet.qd.qclass
+        }
+        Dns_an=str(Dns_packet.an)
         Dns_ns=Dns_packet.ns
         Dns_ar=Dns_packet.ar
         DataCache['DNS'] = {
@@ -159,107 +163,118 @@ def packet_callback(packet):
         Raw_packet = packet['Raw']
         Raw_load = Raw_packet.load
         try:
-            Http_request = http.HTTPRequest(Raw_load)
-            Http_method = Http_request.Method
-            Http_path = Http_request.Path
-            Http_version = Http_request.Http_Version
-            Http_host = Http_request.Host
-            Http_user_agent = Http_request.User_Agent
-            Http_accept = Http_request.Accept
-            Http_accept_language = Http_request.Accept_Language
-            Http_accept_encoding = Http_request.Accept_Encoding
-            Http_accept_charset = Http_request.Accept_Charset
-            Http_referer = Http_request.Referer
-            Http_authorization = Http_request.Authorization
-            Http_expect = Http_request.Expect
-            Http_from = Http_request.From
-            Http_if_match = Http_request.If_Match
-            Http_if_modified_since = Http_request.If_Modified_Since
-            Http_if_none_match = Http_request.If_None_Match
-            Http_if_range = Http_request.If_Range
-            Http_if_unmodified_since = Http_request.If_Unmodified_Since
-            Http_max_forwards = Http_request.Max_Forwards
-            Http_proxy_authorization = Http_request.Proxy_Authorization
-            Http_range = Http_request.Range
-            Http_te = Http_request.TE
-            Http_cache_control = Http_request.Cache_Control
-            Http_connection = Http_request.Connection
-            Http_date = Http_request.Date
-            Http_pragma = Http_request.Pragma
-            Http_trailer = Http_request.Trailer
-            Http_transfer_encoding = Http_request.Transfer_Encoding
-            Http_upgrade = Http_request.Upgrade
-            Http_via = Http_request.Via
-            Http_warning = Http_request.Warning
-            Http_keep_alive = Http_request.Keep_Alive
-            Http_allow = Http_request.Allow
-            Http_content_encoding = Http_request.Content_Encoding
-            Http_content_language = Http_request.Content_Language
-            Http_content_length = Http_request.Content_Length
-            Http_content_location = Http_request.Content_Location
-            Http_content_md5 = Http_request.Content_MD5
-            Http_content_range = Http_request.Content_Range
-            Http_content_type = Http_request.Content_Type
-            Http_expires = Http_request.Expires
-            Http_last_modified = Http_request.Last_Modified
-            Http_cookie = Http_request.Cookie
-            Http_headers = Http_request.Headers
-            Http_additional_headers = Http_request.Additional_Headers
-
-            DataCache['HTTP'] = {
-                "Method": Http_method,
-                "Path": Http_path,
-                "Http_Version": Http_version,
-                "Host": Http_host,
-                "User_Agent": Http_user_agent,
-                "Accept": Http_accept,
-                "Accept_Language": Http_accept_language,
-                "Accept_Encoding": Http_accept_encoding,
-                "Accept_Charset": Http_accept_charset,
-                "Referer": Http_referer,
-                "Authorization": Http_authorization,
-                "Expect": Http_expect,
-                "From": Http_from,
-                "If_Match": Http_if_match,
-                "If_Modified_Since": Http_if_modified_since,
-                "If_None_Match": Http_if_none_match,
-                "If_Range": Http_if_range,
-                "If_Unmodified_Since": Http_if_unmodified_since,
-                "Max_Forwards": Http_max_forwards,
-                "Proxy_Authorization": Http_proxy_authorization,
-                "Range": Http_range,
-                "TE": Http_te,
-                "Cache_Control": Http_cache_control,
-                "Connection": Http_connection,
-                "Date": Http_date,
-                "Pragma": Http_pragma,
-                "Trailer": Http_trailer,
-                "Transfer_Encoding": Http_transfer_encoding,
-                "Upgrade": Http_upgrade,
-                "Via": Http_via,
-                "Warning": Http_warning,
-                "Keep_Alive": Http_keep_alive,
-                "Allow": Http_allow,
-                "Content_Encoding": Http_content_encoding,
-                "Content_Language": Http_content_language,
-                "Content_Length": Http_content_length,
-                "Content_Location": Http_content_location,
-                "Content_MD5": Http_content_md5,
-                "Content_Range": Http_content_range,
-                "Content_Type": Http_content_type,
-                "Expires": Http_expires,
-                "Last_Modified": Http_last_modified,
-                "Cookie": Http_cookie,
-                "Headers": Http_headers,
-                "Additional_Headers": Http_additional_headers
+            http_packet=Http.HTTP(Raw_load)
+            DataCache['HTTP']={
+                "load":http_packet.fields,
             }
+            # Http_request = http.HTTPRequest(Raw_load)
+            # Http_method = Http_request.Method
+            # Http_path = Http_request.Path
+            # Http_version = Http_request.Http_Version
+            # Http_host = Http_request.Host
+            # Http_user_agent = Http_request.User_Agent
+            # Http_accept = Http_request.Accept
+            # Http_accept_language = Http_request.Accept_Language
+            # Http_accept_encoding = Http_request.Accept_Encoding
+            # Http_accept_charset = Http_request.Accept_Charset
+            # Http_referer = Http_request.Referer
+            # Http_authorization = Http_request.Authorization
+            # Http_expect = Http_request.Expect
+            # Http_from = Http_request.From
+            # Http_if_match = Http_request.If_Match
+            # Http_if_modified_since = Http_request.If_Modified_Since
+            # Http_if_none_match = Http_request.If_None_Match
+            # Http_if_range = Http_request.If_Range
+            # Http_if_unmodified_since = Http_request.If_Unmodified_Since
+            # Http_max_forwards = Http_request.Max_Forwards
+            # Http_proxy_authorization = Http_request.Proxy_Authorization
+            # Http_range = Http_request.Range
+            # Http_te = Http_request.TE
+            # Http_cache_control = Http_request.Cache_Control
+            # Http_connection = Http_request.Connection
+            # Http_date = Http_request.Date
+            # Http_pragma = Http_request.Pragma
+            # Http_trailer = Http_request.Trailer
+            # Http_transfer_encoding = Http_request.Transfer_Encoding
+            # Http_upgrade = Http_request.Upgrade
+            # Http_via = Http_request.Via
+            # Http_warning = Http_request.Warning
+            # Http_keep_alive = Http_request.Keep_Alive
+            # Http_allow = Http_request.Allow
+            # Http_content_encoding = Http_request.Content_Encoding
+            # Http_content_language = Http_request.Content_Language
+            # Http_content_length = Http_request.Content_Length
+            # Http_content_location = Http_request.Content_Location
+            # Http_content_md5 = Http_request.Content_MD5
+            # Http_content_range = Http_request.Content_Range
+            # Http_content_type = Http_request.Content_Type
+            # Http_expires = Http_request.Expires
+            # Http_last_modified = Http_request.Last_Modified
+            # Http_cookie = Http_request.Cookie
+            # Http_headers = Http_request.Headers
+            # Http_additional_headers = Http_request.Additional_Headers
+
+            # DataCache['HTTP'] = {
+            #     "Method": Http_method,
+            #     "Path": Http_path,
+            #     "Http_Version": Http_version,
+            #     "Host": Http_host,
+            #     "User_Agent": Http_user_agent,
+            #     "Accept": Http_accept,
+            #     "Accept_Language": Http_accept_language,
+            #     "Accept_Encoding": Http_accept_encoding,
+            #     "Accept_Charset": Http_accept_charset,
+            #     "Referer": Http_referer,
+            #     "Authorization": Http_authorization,
+            #     "Expect": Http_expect,
+            #     "From": Http_from,
+            #     "If_Match": Http_if_match,
+            #     "If_Modified_Since": Http_if_modified_since,
+            #     "If_None_Match": Http_if_none_match,
+            #     "If_Range": Http_if_range,
+            #     "If_Unmodified_Since": Http_if_unmodified_since,
+            #     "Max_Forwards": Http_max_forwards,
+            #     "Proxy_Authorization": Http_proxy_authorization,
+            #     "Range": Http_range,
+            #     "TE": Http_te,
+            #     "Cache_Control": Http_cache_control,
+            #     "Connection": Http_connection,
+            #     "Date": Http_date,
+            #     "Pragma": Http_pragma,
+            #     "Trailer": Http_trailer,
+            #     "Transfer_Encoding": Http_transfer_encoding,
+            #     "Upgrade": Http_upgrade,
+            #     "Via": Http_via,
+            #     "Warning": Http_warning,
+            #     "Keep_Alive": Http_keep_alive,
+            #     "Allow": Http_allow,
+            #     "Content_Encoding": Http_content_encoding,
+            #     "Content_Language": Http_content_language,
+            #     "Content_Length": Http_content_length,
+            #     "Content_Location": Http_content_location,
+            #     "Content_MD5": Http_content_md5,
+            #     "Content_Range": Http_content_range,
+            #     "Content_Type": Http_content_type,
+            #     "Expires": Http_expires,
+            #     "Last_Modified": Http_last_modified,
+            #     "Cookie": Http_cookie,
+            #     "Headers": Http_headers,
+            #     "Additional_Headers": Http_additional_headers
+            # }
         except:
             DataCache['Raw'] = {
             "load": str(Raw_load)
             }
+    if packet.haslayer('Padding'):
+        Padding_packet=packet['Padding']
+        Padding_laod=Padding_packet.load
+        DataCache['Padding']={
+            "load":str(Padding_laod)
+        }
     FlowDict={"summary":packet.summary(),"exactinfo":DataCache}
     PacketObject.append(FlowDict)
     CallBack.append(packet.summary())
+    print(packet.show())
 def Catch(count:int):
     sniff(prn=packet_callback,count=count,iface='Realtek Gaming 2.5GbE Family Controller',filter='')
     return CallBack

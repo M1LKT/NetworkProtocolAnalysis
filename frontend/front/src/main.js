@@ -7,9 +7,10 @@ import 'element-ui/lib/theme-chalk/index.css';
 import VueAxios from 'vue-axios'
 import axios from 'axios'
 import request from './utils/request';
+import JsonViewer from 'vue-json-viewer'
 
 Vue.config.productionTip = false
-Vue.use(ElementUI).use(VueAxios,axios);
+Vue.use(ElementUI).use(VueAxios,axios).use(JsonViewer);
 Vue.prototype.$request=request
 
 new Vue({
