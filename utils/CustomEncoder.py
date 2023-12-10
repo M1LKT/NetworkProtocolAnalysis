@@ -8,5 +8,5 @@ class CustomJSONEncoder(json.JSONEncoder):
         if isinstance(obj, DNSQR):
             return str(obj)
         if isinstance(obj, bytes):
-            return str(obj)  # 或者使用你需要的其他编码
+            return str(obj,'utf-8')  # 或者使用你需要的其他编码
         return super().default(obj)

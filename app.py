@@ -37,13 +37,7 @@ def FlowPacket():
     data=request.get_data()
     Settings=json.loads(data)
     callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
-    try:
-        return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
-    except TypeError:
-        print("flag")
-        print(TypeError)
-        print(callback)
-        return jsonify(R.Result.success("1")),{"Content-Type":"application/json"}
+    return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
 @app.route('/SearchNIC')
 def NICSearch():
     return jsonify(R.Result.success(NICPacket)),{"Content-Type":"application/json"}
