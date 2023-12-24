@@ -1,3 +1,5 @@
 .env
 __pycache__
 frontend/front/src/views/test.vue
+backend/utils/analysisPic/*
+backend/pcapreceive/*

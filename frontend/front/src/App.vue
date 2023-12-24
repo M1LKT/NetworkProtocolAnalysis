@@ -1,7 +1,8 @@
 <template>
   <div id="app">
     <nav>
-
+      <router-link to="/Main">流量抓取</router-link> |
+      <router-link to="/analysis">PCAP分析</router-link>
     </nav>
     <router-view/>
   </div>

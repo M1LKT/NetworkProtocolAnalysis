@@ -6,24 +6,20 @@ from flask_cors import CORS
 import json
 import common.Result as R
 import utils.SearchNIC
+import utils.FlowClassify
+
+#测试用
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 CORS(app)
 app.json_encoder = utils.CustomEncoder.CustomJSONEncoder
 
 NICPacket=utils.SearchNIC.GetNetworkAdapters()
-@app.route('/hello')
-def hello():
-    return '<h1>Hello Totoro!</h1>'
 @app.route('/user/<name>')
 def user_page(name):
     return f'User page {escape(name)}' #使用 MarkupSafe（Flask 的依赖之一）提供的 escape() 函数对 name 变量进行转义处理，比如把 < 转换成 &lt;
-@app.route('/test')
-def test_url_for():
-    print(url_for('hello'))
-    print(url_for('user_page', name='greyli'))
-    print(utils.FlowCatch.Catch())
-    return 'Test page'
 @app.route('/FlowCatch/<FlowNum>')
 def CatchFlow(FlowNum:int):
     if not FlowNum >=0:
@@ -53,3 +49,26 @@ def Recive():
     Settings=json.loads(data)  #获得一个包含了Filter、Adapter、Counts属性的字典
     callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
     return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
+@app.route('/PcapFile',methods=['POST','GET'])
+def PcapFile():
+    if 'file' not in request.files:
+        return jsonify(R.Result.error("No file part")), {"Content-Type": "application/json"}
+
+    file = request.files['file']
+
+    # 如果用户没有选择文件，浏览器也会提交一个空的文件部分，所以需要检查文件是否存在
+    if file.filename == '':
+        return jsonify(R.Result.error("No selected file")), {"Content-Type": "application/json"}
+
+    if file:
+        filename = file.filename
+        basename, extension = os.path.splitext(filename)
+        if not(extension == '.pcap'or extension == '.pcapng'):
+            return jsonify(R.Result.error(msg="请上传pcap或pcapng文件！")), {"Content-Type": "application/json"}
+        # 使用 Werkzeug 的 secure_filename 函数确保文件名是安全的
+        filename = secure_filename(file.filename)
+        # 保存文件到服务器
+        file.save(os.path.join('./pcapreceive', filename))
+        print(filename)
+        utils.FlowClassify.classifyFlow(filename)
+        return jsonify(R.Result.success(msg="分析完成!")),{"Content-Type":"application/json"}
