@@ -43,7 +43,6 @@ def classifyFlow(pcapfilename):
     ProcessedData=[]
     # 读取pcap文件
     analysisFilePath=f"pcapreceive\\{pcapfilename}"
-    print(analysisFilePath)
     packets = rdpcap(analysisFilePath)
     CatchTime=packets[-1].time-packets[0].time
     streamer = nfstream.NFStreamer(source=analysisFilePath)
@@ -137,6 +136,11 @@ def classifyFlow(pcapfilename):
     plt.xticks(rotation=315,fontproperties=font)
     plt.ylabel('平均业务流量速率（经过对数处理）',fontproperties=font)
     plt.savefig('utils/analysisPic/ServiceTrafficRate.png')
+    ProcessedData.append(Lowlatency.totalbytes+Guaranteedlatency.totalbytes+GuaranteedDelivery.totalbytes+BestEffortDelivery.totalbytes+Other.totalbytes) 
+    #ProcessedData: [ApplicationCategoryNameCount,CatchTime,TotalBytes]
+    ProcessedData.append(ProcessedData[2]/ProcessedData[1])
+    #ProcessedData: [ApplicationCategoryNameCount,CatchTime,TotalBytes,TotalRate]
+    return ProcessedData
 def main():
     classifyFlow('Catch1.pcapng')
 if __name__ == '__main__':

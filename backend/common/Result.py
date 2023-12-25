@@ -39,7 +39,7 @@ class Result:
 
 
     @staticmethod
-    def success(data='null'):
+    def success(msg='请求成功',data='null'):
         """
         创建一个success类型的Result对象。
 
@@ -49,7 +49,7 @@ class Result:
         Returns:
             返回一个字典对象，包含success类型的Result对象。
         """
-        return Result('请求成功', Result.CODE_SUCCESS, data).to_dict()
+        return Result(msg, Result.CODE_SUCCESS, data).to_dict()
       
     @staticmethod
     def error(msg, code=CODE_SYS_ERROR, data='null'):

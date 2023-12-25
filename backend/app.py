@@ -1,4 +1,4 @@
-from flask import Flask,render_template,url_for,jsonify,request
+from flask import Flask,render_template,url_for,jsonify,request,send_from_directory
 from markupsafe import escape
 import utils.FlowCatch
 import utils.CustomEncoder
@@ -7,6 +7,8 @@ import json
 import common.Result as R
 import utils.SearchNIC
 import utils.FlowClassify
+import utils.ClassifyDataAnalysis
+import utils.StandardizedData
 
 #测试用
 from werkzeug.utils import secure_filename
@@ -69,6 +71,11 @@ def PcapFile():
         filename = secure_filename(file.filename)
         # 保存文件到服务器
         file.save(os.path.join('./pcapreceive', filename))
-        print(filename)
-        utils.FlowClassify.classifyFlow(filename)
-        return jsonify(R.Result.success(msg="分析完成!")),{"Content-Type":"application/json"}
+        PreliminaryProcessingData=utils.FlowClassify.classifyFlow(filename)
+        AnalysisResult=utils.ClassifyDataAnalysis.analysisData(PreliminaryProcessingData)
+        print(utils.StandardizedData.standardizedData(AnalysisResult,{}))
+        return jsonify(R.Result.success(msg="分析完成!",data=AnalysisResult)),{"Content-Type":"application/json"}
+        #返回data中包含分析结果，一个列表，列表中是图片的键值对，包含图片名和相对路径，用于前端调用get_image函数
+@app.route('/get_image/<image_name>',methods=['GET'])
+def get_image(image_name):
+    return send_from_directory('utils/analysisPic', image_name)
