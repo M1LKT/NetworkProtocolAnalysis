@@ -15,7 +15,7 @@
         </div>
         <div>
             <h2>{{ AnalysisResult }}</h2>
-            <img :src="imagePath" alt="My Image">
+            <img v-if="Image1Name" :src="this.$request.defaults.baseURL+'/get_image/' + Image1Name" alt="My Image">
         </div>
     </div>
 </template>
@@ -26,7 +26,7 @@
       return {
         fileList: [],
         AnalysisResult: '',
-        imagePath: '/ServiceTrafficRate.png'
+        Image1Name:''
       };
     },
     methods: {
@@ -44,10 +44,16 @@
                     message: response.msg,
                     type: 'success'
                 });
-                this.AnalysisResult=response.data
+                this.AnalysisResult=response.data.AnalysisResult
+                console.log(response.data[1].Image1.imageName)
+                this.Image1Name=response.data[1].Image1.imageName
             }
             console.log(response);  // 这里可以处理你的响应
-        }
-    }
+        },
+    },
+    // mounted(){
+    //         console.log('1')
+    //         console.log(this.$request.defaults.baseURL)
+    // }
   }
 </script>

@@ -8,7 +8,7 @@ import common.Result as R
 import utils.SearchNIC
 import utils.FlowClassify
 import utils.ClassifyDataAnalysis
-import utils.StandardizedData
+from utils.StandardizedData import standardizedData
 
 #测试用
 from werkzeug.utils import secure_filename
@@ -73,8 +73,13 @@ def PcapFile():
         file.save(os.path.join('./pcapreceive', filename))
         PreliminaryProcessingData=utils.FlowClassify.classifyFlow(filename)
         AnalysisResult=utils.ClassifyDataAnalysis.analysisData(PreliminaryProcessingData)
-        print(utils.StandardizedData.standardizedData(AnalysisResult,{}))
-        return jsonify(R.Result.success(msg="分析完成!",data=AnalysisResult)),{"Content-Type":"application/json"}
+        standarddata=standardizedData(
+            AnalysisResult=AnalysisResult,
+            Image1={'imageName':'ProportionOfBusinessTraffic.png'},
+            Image2={'imageName':'NumberOfTrafficCommunicationHosts.png'},
+            Image3={'imageName':'ServiceTrafficRate.png'}
+            )
+        return jsonify(R.Result.success(msg="分析完成!",data=standarddata)),{"Content-Type":"application/json"}
         #返回data中包含分析结果，一个列表，列表中是图片的键值对，包含图片名和相对路径，用于前端调用get_image函数
 @app.route('/get_image/<image_name>',methods=['GET'])
 def get_image(image_name):

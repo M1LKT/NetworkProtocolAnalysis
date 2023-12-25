@@ -1,7 +1,6 @@
 from scapy.all import *
 import time
 import datetime
-import utils.scapy_http as http
 import scapy.layers.http as Http
 
 CallBack=[]

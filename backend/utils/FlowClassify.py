@@ -40,6 +40,7 @@ def log10_positive(x):
     return math.log10(x) if x > 0 else 0
 
 def classifyFlow(pcapfilename):
+    plt.close('all')
     ProcessedData=[]
     # 读取pcap文件
     analysisFilePath=f"pcapreceive\\{pcapfilename}"

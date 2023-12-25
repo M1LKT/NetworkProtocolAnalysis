@@ -1,4 +1,4 @@
-def standrdizedData(**kwargs):
+def standardizedData(**kwargs):
     """
     标准化数据的函数。
 
@@ -9,8 +9,8 @@ def standrdizedData(**kwargs):
         list: 标准化后的数据列表，每个元素都是一个字典，包含一个键值对。
 
     """
-    StandrdizedData = []
+    StandardizedData = []
     for key, value in kwargs.items():
         data={key:value}
-        StandrdizedData.append(data)
-    return StandrdizedData
+        StandardizedData.append(data)
+    return StandardizedData

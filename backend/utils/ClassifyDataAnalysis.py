@@ -24,6 +24,4 @@ def analysisData(PreliminaryProcessingData:list):
     TotalBytes=betterBytes(TotalBytes)
     TotalRate=betterBytes(TotalRate)
     analysis=f'本次抓包共捕获{FlowNum}条流量，抓包时间为{CatchTime:.2f}秒，总流量为{TotalBytes}，平均流量速率为{TotalRate}ps。'
-
-
     return analysis
