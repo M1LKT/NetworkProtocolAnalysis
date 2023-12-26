@@ -15,45 +15,73 @@
         </div>
         <div>
             <h2>{{ AnalysisResult }}</h2>
-            <img v-if="Image1Name" :src="this.$request.defaults.baseURL+'/get_image/' + Image1Name" alt="My Image">
+        </div>
+        <div v-if="Imagename !== ''" style="width: 800px;;margin: 0px auto;">
+            <el-carousel type="card" height="350px" :autoplay="false" arrow="never">
+                <el-carousel-item item v-for="(item,index) in Imagename" :key="item"  style="background-color: aliceblue;" >
+                    <img :src="$request.defaults.baseURL+'/get_image/' + item" style="width: 100%; height: 300px;"  alt="Carousel Image">
+                    <p style="width: 100%; height: auto;">{{ LabelName[index] }}</p>
+                </el-carousel-item>
+            </el-carousel>
         </div>
     </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        fileList: [],
-        AnalysisResult: '',
-        Image1Name:''
-      };
-    },
-    methods: {
-        handleChange(file, fileList) {
-            this.fileList = fileList.slice(-1);
+    export default {
+        data() {
+        return {
+            fileList: [],
+            AnalysisResult: '',
+            Imagename:[],
+            LabelName:[
+                '业务流量占比',
+                '业务流量通信主机数',
+                '业务流量速率',
+            ]
+        };
         },
-        handleSuccess(response, file, fileList) {
-            if (response.code !== "200") {
-                this.$message({
-                    message: response.msg,
-                    type: 'error'
-                });
-            } else {
-                this.$message({
-                    message: response.msg,
-                    type: 'success'
-                });
-                this.AnalysisResult=response.data.AnalysisResult
-                console.log(response.data[1].Image1.imageName)
-                this.Image1Name=response.data[1].Image1.imageName
+        methods: {
+            handleChange(file, fileList) {
+                this.fileList = fileList.slice(-1);
+            },
+            handleSuccess(response, file, fileList) {
+                if (response.code !== "200") {
+                    this.$message({
+                        message: response.msg,
+                        type: 'error'
+                    });
+                } else {
+                    this.$message({
+                        message: response.msg,
+                        type: 'success'
+                    });
+                    this.AnalysisResult=response.data[0].AnalysisResult
+                    console.log(response.data[1].Image1.imageName)
+                    this.Imagename.push(response.data[1].Image1.imageName)
+                    this.Imagename.push(response.data[2].Image2.imageName)
+                    this.Imagename.push(response.data[3].Image3.imageName)
+                }
+                console.log(response);  // 这里可以处理你的响应
             }
-            console.log(response);  // 这里可以处理你的响应
         },
-    },
-    // mounted(){
-    //         console.log('1')
-    //         console.log(this.$request.defaults.baseURL)
-    // }
-  }
+    }
 </script>
+
+<style>
+  .el-carousel__item h3 {
+    color: #475669;
+    font-size: 14px;
+    opacity: 0.75;
+    line-height: 200px;
+    margin: 0;
+  }
+  
+  .el-carousel__item:nth-child(2n) {
+    background-color: #99a9bf;
+  }
+  
+  .el-carousel__item:nth-child(2n+1) {
+    background-color: #d3dce6;
+  }
+</style>
