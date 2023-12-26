@@ -41,7 +41,7 @@
             </el-table>
         </el-card>
         <el-button type="primary" style="background:#505458 ;border:none ;margin-top: 40px;" @click="FlowCatch('Settings')">抓取</el-button>
-        <el-card style="width: 1050px;margin: 50px auto;text-align: start;">
+        <el-card v-if="showCard" style="width: 1050px;margin: 50px auto;text-align: start;">
             <h3 style="margin-top: 5px; ">详细信息</h3>
             <p>{{ Summary }}</p>
             <json-viewer :value="ExactInfo"  ></json-viewer>
@@ -68,7 +68,8 @@ export default{
                 ],
             },
             ExactInfo:[],
-            Summary:''
+            Summary:'',
+            showCard: false,
         }
     },
     methods:{
@@ -88,6 +89,7 @@ export default{
             })
         },
         handleClick(row) {
+            this.showCard = true;
             console.log(row);
             this.ExactInfo=row.exactinfo
             this.Summary=row.summary

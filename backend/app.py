@@ -36,21 +36,21 @@ def FlowPacket():
     Settings=json.loads(data)
     callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
     try:
-        return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
+        return jsonify(R.Result.success(data=callback)),{"Content-Type":"application/json"}
     except:
         print()
         print(callback)
-        return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
+        return jsonify(R.Result.success(data=callback)),{"Content-Type":"application/json"}
 @app.route('/SearchNIC')
 def NICSearch():
-    return jsonify(R.Result.success(NICPacket)),{"Content-Type":"application/json"}
+    return jsonify(R.Result.success(data=NICPacket)),{"Content-Type":"application/json"}
 @app.route('/SendJson',methods=['POST'])
 def Recive():
     utils.FlowCatch.Clear()
     data=request.get_data()
     Settings=json.loads(data)  #获得一个包含了Filter、Adapter、Counts属性的字典
     callback=utils.FlowCatch.catch(Settings['Counts'],Settings['Adapter'],Settings['Filter'])
-    return jsonify(R.Result.success(callback)),{"Content-Type":"application/json"}
+    return jsonify(R.Result.success(data=callback)),{"Content-Type":"application/json"}
 @app.route('/PcapFile',methods=['POST','GET'])
 def PcapFile():
     if 'file' not in request.files:
