@@ -80,7 +80,7 @@ def PcapFile():
             Image3={'imageName':'ServiceTrafficRate.png'}
             )
         return jsonify(R.Result.success(msg="分析完成!",data=standarddata)),{"Content-Type":"application/json"}
-        #返回data中包含分析结果，一个列表，列表中是图片的键值对，包含图片名和相对路径，用于前端调用get_image函数
+        #返回data中包含分析结果，一个列表，列表中是图片的字典，包含图片名，用于前端调用get_image函数
 @app.route('/get_image/<image_name>',methods=['GET'])
 def get_image(image_name):
     return send_from_directory('utils/analysisPic', image_name)
