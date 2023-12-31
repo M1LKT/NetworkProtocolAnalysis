@@ -7,7 +7,7 @@
 
 #### 下载方法
 
-1.`https://github.com/M1LKT/NetworkProtocolAnalysis.git` 下载项目到本地
+1.`git clone https://github.com/M1LKT/NetworkProtocolAnalysis.git` 下载项目到本地
 
 2.`pip install -r requirements.txt`下载后端依赖
 
