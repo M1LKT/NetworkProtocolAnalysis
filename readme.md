@@ -25,4 +25,4 @@
 PCAP文件分析页面：将pcap文件上传，随后会返回对文件的统计分析。
 
 #### 2024.1.4更新
-在分析页面接入了星火大模型辅助分析，使用者需要在按照backend\utils\StarFireAPI\config.json.example的格式创建config.json，详细参数参考讯飞星火的api文档：`https://www.xfyun.cn/doc/spark/Web.html#_1-%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E`
+在分析页面接入了星火大模型辅助分析，使用者需要在按照backend\utils\StarFireAPI\config.json.example的格式创建config.json，详细参数参考讯飞星火的api文档：`https://www.xfyun.cn/doc/`
