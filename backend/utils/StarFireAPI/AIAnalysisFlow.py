@@ -1,13 +1,11 @@
 import utils.StarFireAPI.SparkApi as SparkApi
 import json
-
 def load_config():
     with open('utils\\StarFireAPI\\config.json', 'r') as f:
         config = json.load(f)
     return config
 
 config = load_config()
-
 #以下密钥信息从控制台获取
 appid = config['AppId']     #填写控制台中获取的 APPID 信息
 api_secret = config['APISecret']   #填写控制台中获取的 APISecret 信息
