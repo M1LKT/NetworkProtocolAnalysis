@@ -9,6 +9,7 @@ import utils.SearchNIC
 import utils.FlowClassify
 import utils.ClassifyDataAnalysis
 from utils.StandardizedData import standardizedData
+import utils.StarFireAPI.AIAnalysisFlow as AIAnalysisFlow
 
 #测试用
 from werkzeug.utils import secure_filename
@@ -19,16 +20,10 @@ CORS(app)
 app.json_encoder = utils.CustomEncoder.CustomJSONEncoder
 
 NICPacket=utils.SearchNIC.GetNetworkAdapters()
+
 @app.route('/user/<name>')
 def user_page(name):
     return f'User page {escape(name)}' #使用 MarkupSafe（Flask 的依赖之一）提供的 escape() 函数对 name 变量进行转义处理，比如把 < 转换成 &lt;
-@app.route('/FlowCatch/<FlowNum>')
-def CatchFlow(FlowNum:int):
-    if not FlowNum >=0:
-        FlowNum=5
-    utils.FlowCatch.Clear()
-    callback=utils.FlowCatch.Catch(FlowNum) 
-    return render_template('result.html',callback=callback )
 @app.route('/',methods=['POST'])
 def FlowPacket():
     utils.FlowCatch.Clear()
@@ -53,6 +48,7 @@ def Recive():
     return jsonify(R.Result.success(data=callback)),{"Content-Type":"application/json"}
 @app.route('/PcapFile',methods=['POST','GET'])
 def PcapFile():
+    global PreliminaryProcessingData
     if 'file' not in request.files:
         return jsonify(R.Result.error("No file part")), {"Content-Type": "application/json"}
 
@@ -72,6 +68,7 @@ def PcapFile():
         # 保存文件到服务器
         file.save(os.path.join('./pcapreceive', filename))
         PreliminaryProcessingData=utils.FlowClassify.classifyFlow(filename)
+        #PreliminaryProcessingData:[ApplicationCategoryNameCount,CatchTime,TotalBytes,TotalRate,Bussiness,TransSpeed]
         AnalysisResult=utils.ClassifyDataAnalysis.analysisData(PreliminaryProcessingData)
         standarddata=standardizedData(
             AnalysisResult=AnalysisResult,
@@ -84,3 +81,10 @@ def PcapFile():
 @app.route('/get_image/<image_name>',methods=['GET'])
 def get_image(image_name):
     return send_from_directory('utils/analysisPic', image_name)
+
+@app.route('/AIAnalysisFlow',methods=['POST'])
+def AIAnswerTest():
+    global PreliminaryProcessingData
+    question=AIAnalysisFlow.questionTemplate(PreliminaryProcessingData)
+    aianswer=AIAnalysisFlow.getAnswer(question)
+    return jsonify(R.Result.success(data=aianswer)),{"Content-Type":"application/json"}

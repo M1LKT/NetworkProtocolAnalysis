@@ -143,6 +143,8 @@ def classifyFlow(pcapfilename):
     #ProcessedData: [ApplicationCategoryNameCount,CatchTime,TotalBytes,TotalRate]
     ProcessedData.append(Bussiness)
     #ProcessedData: [ApplicationCategoryNameCount,CatchTime,TotalBytes,TotalRate,Bussiness]
+    ProcessedData.append(TransSpeed)
+    #ProcessedData: [ApplicationCategoryNameCount,CatchTime,TotalBytes,TotalRate,Bussiness,TransSpeed]
     return ProcessedData
 def main():
     classifyFlow('Catch1.pcapng')

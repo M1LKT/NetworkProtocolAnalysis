@@ -3,3 +3,5 @@ __pycache__
 frontend/front/src/views/test.vue
 backend/utils/analysisPic/*
 backend/pcapreceive/*
+backend/utils/StarFireAPI/Log/*
+backend/utils/StarFireAPI/config.json
